@@ -1,0 +1,42 @@
+{
+  "contact": {
+    "title": "Contact Form",
+    "submit": "Submit",
+    "thanks": "Thanks for your submission!",
+    "consent": "By continuing, you agree to our <a href=\"/terms-and-conditions/\">Terms &amp; Conditions</a> and <a href=\"/privacy-policy/\">Privacy Policy</a>",
+    "fields": [
+      {
+        "key": "name",
+        "label": "Name",
+        "type": "text",
+        "required": true,
+        "max": 200,
+        "placeholder": "Name"
+      },
+      {
+        "key": "email",
+        "label": "Email",
+        "type": "email",
+        "required": true,
+        "max": 254,
+        "placeholder": "Email"
+      },
+      {
+        "key": "phone",
+        "label": "Phone",
+        "type": "tel",
+        "required": false,
+        "max": 40,
+        "placeholder": "Phone"
+      },
+      {
+        "key": "message",
+        "label": "Message",
+        "type": "textarea",
+        "required": true,
+        "max": 10000,
+        "placeholder": "Message"
+      }
+    ]
+  }
+}

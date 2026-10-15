@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": {
+      "contentSize": "760px",
+      "wideSize": "1320px"
+    },
+    "color": {
+      "palette": [
+        { "slug": "ink", "name": "Ink", "color": "#0c0c0d" },
+        { "slug": "charcoal", "name": "ORWO Charcoal", "color": "#1c1c1c" },
+        { "slug": "smoke", "name": "Smoke", "color": "#2a2a2d" },
+        { "slug": "paper", "name": "Paper", "color": "#f4f2ee" },
+        { "slug": "white", "name": "White", "color": "#ffffff" },
+        { "slug": "cyan", "name": "ORWO Cyan", "color": "#26c9ff" },
+        { "slug": "muted", "name": "Muted", "color": "#a4a4aa" }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "name": "Playfair Display",
+          "slug": "playfair",
+          "fontFamily": "\"Playfair Display\", Georgia, serif",
+          "fontFace": [
+            { "fontFamily": "Playfair Display", "fontStyle": "normal", "fontWeight": "400 700", "fontDisplay": "swap", "src": [ "file:./assets/fonts/playfair-normal-latin.woff2" ], "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD" },
+            { "fontFamily": "Playfair Display", "fontStyle": "normal", "fontWeight": "400 700", "fontDisplay": "swap", "src": [ "file:./assets/fonts/playfair-normal-latin-ext.woff2" ], "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF" },
+            { "fontFamily": "Playfair Display", "fontStyle": "italic", "fontWeight": "400 700", "fontDisplay": "swap", "src": [ "file:./assets/fonts/playfair-italic-latin.woff2" ], "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD" },
+            { "fontFamily": "Playfair Display", "fontStyle": "italic", "fontWeight": "400 700", "fontDisplay": "swap", "src": [ "file:./assets/fonts/playfair-italic-latin-ext.woff2" ], "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF" }
+          ]
+        },
+        {
+          "name": "Manrope",
+          "slug": "manrope",
+          "fontFamily": "Manrope, \"Helvetica Neue\", Arial, sans-serif",
+          "fontFace": [
+            { "fontFamily": "Manrope", "fontStyle": "normal", "fontWeight": "200 800", "fontDisplay": "swap", "src": [ "file:./assets/fonts/manrope-normal-latin.woff2" ], "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD" },
+            { "fontFamily": "Manrope", "fontStyle": "normal", "fontWeight": "200 800", "fontDisplay": "swap", "src": [ "file:./assets/fonts/manrope-normal-latin-ext.woff2" ], "unicodeRange": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF" }
+          ]
+        }
+      ]
+    },
+    "spacing": {
+      "units": [ "px", "rem", "vw", "%" ]
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#0c0c0d",
+      "text": "#f2f0eb"
+    },
+    "typography": {
+      "fontFamily": "var:preset|font-family|manrope",
+      "fontSize": "17px",
+      "lineHeight": "1.7"
+    },
+    "spacing": {
+      "blockGap": "1.2rem"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var:preset|font-family|playfair",
+          "fontWeight": "500",
+          "lineHeight": "1.12"
+        }
+      },
+      "link": {
+        "color": { "text": "inherit" }
+      },
+      "button": {
+        "color": { "background": "#26c9ff", "text": "#06141a" },
+        "border": { "radius": "999px" },
+        "typography": { "fontFamily": "var:preset|font-family|manrope", "fontSize": "15px", "fontWeight": "700" },
+        "spacing": { "padding": { "top": "15px", "bottom": "15px", "left": "28px", "right": "28px" } }
+      }
+    }
+  },
+  "templateParts": [
+    { "name": "header", "title": "Header", "area": "header" },
+    { "name": "footer", "title": "Footer", "area": "footer" }
+  ]
+}

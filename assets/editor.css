@@ -1,0 +1,8 @@
+/* Block editor: the same design as the website so editors see what visitors see. Animations stay off while editing. */
+.editor-styles-wrapper { background: #0c0c0d; color: #f2f0eb; }
+.editor-styles-wrapper .rv, .editor-styles-wrapper .rv-zoom { opacity: 1 !important; transform: none !important; }
+.editor-styles-wrapper .hero-photo img, .editor-styles-wrapper .film-can img, .editor-styles-wrapper .film-can { animation: none !important; }
+.editor-styles-wrapper .marquee-track, .editor-styles-wrapper .logo-track { flex-wrap: wrap; width: auto; }
+.editor-styles-wrapper .wp-block-image:is(.hero-photo, .stages-bg, .story-bg, .banner-photo) > div { width: 100% !important; height: 100% !important; }
+.editor-styles-wrapper .site-header, .editor-styles-wrapper .header-inner { position: relative; }
+.editor-styles-wrapper .film-rail { grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); overflow: visible; }
