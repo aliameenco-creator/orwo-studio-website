@@ -96,11 +96,17 @@ body.admin-bar .site-header { top: 32px; }
 .orwost-nav .wp-block-navigation__submenu-icon { margin-left: 2px; color: rgba(255, 255, 255, .7); }
 .orwost-nav .wp-block-navigation__submenu-container { min-width: 240px !important; padding: 8px !important; border: 1px solid var(--line) !important; border-radius: 20px; background: rgba(20, 20, 23, .97) !important; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .7); transform: translateY(8px); transition: opacity .25s, transform .3s var(--ease), visibility .25s !important; }
 .orwost-nav .has-child:hover > .wp-block-navigation__submenu-container, .orwost-nav .has-child:focus-within > .wp-block-navigation__submenu-container { transform: none; }
-.orwost-nav .wp-block-navigation__submenu-container .wp-block-navigation-item__content { display: block; width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 500; }
-.orwost-nav .wp-block-navigation__submenu-container .wp-block-navigation-item__content:hover { background: rgba(255, 255, 255, .07); color: var(--cyan); }
+/* Core forces submenu links to inherit the submenu box colour, which it sets to black: give the box light text. */
+.orwost-nav .wp-block-navigation__submenu-container { color: rgba(255, 255, 255, .86) !important; }
+.orwost-nav .wp-block-navigation__submenu-container .wp-block-navigation-item__content.wp-block-navigation-item__content { display: block; width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 500; color: rgba(255, 255, 255, .86); }
+.orwost-nav .wp-block-navigation__submenu-container .wp-block-navigation-item__content.wp-block-navigation-item__content:is(:hover, :focus-visible, [aria-current="page"]) { background: rgba(255, 255, 255, .07); color: var(--cyan); }
 .orwost-nav .wp-block-navigation__responsive-container-open, .orwost-nav .wp-block-navigation__responsive-container-close { width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--line-2); color: #fff; background: rgba(12, 12, 13, .35); }
 .header-cta { margin: 0; }
 .header-cta .wp-block-button__link { padding: 12px 20px; font-size: 13.5px; box-shadow: none; }
+/* Desktop: the "Contact Us" button replaces the plain Contact menu link (the link stays in the phone/tablet menu). */
+@media (min-width: 1181px) {
+  .orwost-nav .wp-block-navigation__responsive-container:not(.is-menu-open) .wp-block-navigation__container > .wp-block-navigation-item:has(> a[href$="/contact/"], > a[href$="/contact"]) { display: none; }
+}
 @media (max-width: 1180px) {
   .orwost-nav .wp-block-navigation__responsive-container-open:not(.always-shown) { display: flex; }
   .orwost-nav .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open) { display: none; }

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.1 — 2026-10-16
+
+- Fixed: dropdown menu links (Services, Hotel) were dark grey on the dark menu; they are now light, with cyan on hover.
+- Desktop header shows Contact once: the plain "Contact" menu link is hidden beside the "Contact Us" button
+  (it stays in the phone/tablet menu, where the button is not shown).
+- FAQ page filled: the site's own "Frequently Asked Questions" heading and intro, plus 10 questions answered with facts
+  and wording already published on orwo.studio (location, sound stages, standing sets, tax credit, services, equipment,
+  accommodation, events, props, booking). Owner review recommended. FAQ structured data (FAQPage) added for search.
+- New: Appearance → ORWO Studios Setup lists pages whose design changed in a theme update and updates the selected ones
+  (unedited pages pre-ticked; the previous version is kept under Revisions).
+
+**After updating the theme:** open Appearance → ORWO Studios Setup and click "Update selected pages" to apply the new FAQ.
+
 ## 0.1.0 — 2026-10-15
 
 First version of the ORWO Studios WordPress theme (prepared locally, not yet released or installed).

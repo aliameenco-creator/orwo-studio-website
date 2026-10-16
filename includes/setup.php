@@ -69,6 +69,7 @@ function orwost_pages_seed() {
         update_post_meta( $id, '_orwost_original_path', '/' . $row['path'] );
         // Design version and fingerprint let a later theme release update only pages nobody has edited.
         update_post_meta( $id, '_orwost_design_version', $version );
+        update_post_meta( $id, '_orwost_page_revision', (int) ( $row['revision'] ?? 1 ) );
         update_post_meta( $id, '_orwost_fingerprint', md5( (string) get_post_field( 'post_content', $id ) ) );
         $title = $row['seo_title'] ?? $row['title'] . ' - ORWO Studios';
         update_post_meta( $id, '_orwost_seo_title', $title );
@@ -98,8 +99,68 @@ function orwost_pages_seed() {
     return $report;
 }
 
+/**
+ * Pages whose design a newer theme release changed (pages.json "revision" above the stored one).
+ * "edited" means someone changed the page since setup created it (content no longer matches its fingerprint).
+ */
+function orwost_page_updates() {
+    $out = array();
+    foreach ( orwost_pages_data() as $row ) {
+        $revision = (int) ( $row['revision'] ?? 1 );
+        $id = (int) get_option( 'orwost_page_' . $row['slug'] );
+        $post = $id ? get_post( $id ) : null;
+        if ( $revision < 2 || ! $post || 'trash' === $post->post_status ) { continue; }
+        if ( (int) ( get_post_meta( $id, '_orwost_page_revision', true ) ?: 1 ) >= $revision ) { continue; }
+        $out[ $row['slug'] ] = array( 'row' => $row, 'post' => $post, 'edited' => md5( $post->post_content ) !== get_post_meta( $id, '_orwost_fingerprint', true ) );
+    }
+    return $out;
+}
+function orwost_apply_page_updates( $slugs ) {
+    $report = array();
+    $version = wp_get_theme()->get( 'Version' );
+    foreach ( orwost_page_updates() as $slug => $item ) {
+        $row = $item['row']; $id = $item['post']->ID;
+        if ( ! in_array( $slug, $slugs, true ) ) { $report[] = $row['title'] . ': left unchanged (not selected).'; continue; }
+        wp_save_post_revision( $id );
+        $done = wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => orwost_resolve( (string) file_get_contents( get_theme_file_path( 'parts/pages/' . $slug . '.html' ) ) ) ) ), true );
+        if ( is_wp_error( $done ) ) { $report[] = $row['title'] . ': FAILED — ' . $done->get_error_message(); continue; }
+        update_post_meta( $id, '_orwost_page_revision', (int) $row['revision'] );
+        update_post_meta( $id, '_orwost_design_version', $version );
+        update_post_meta( $id, '_orwost_fingerprint', md5( (string) get_post_field( 'post_content', $id ) ) );
+        // A description the owner set in Yoast or elsewhere is never replaced.
+        if ( ! empty( $row['description'] ) && ! get_post_meta( $id, '_yoast_wpseo_metadesc', true ) ) {
+            update_post_meta( $id, '_orwost_description', $row['description'] );
+            update_post_meta( $id, '_yoast_wpseo_metadesc', $row['description'] );
+        }
+        $report[] = $row['title'] . ': updated to the new design (previous version kept under Revisions).';
+    }
+    update_option( 'orwost_setup_report', $report ?: array( 'No page updates were waiting.' ), false );
+}
+add_action( 'admin_post_orwost_update_pages', function () {
+    if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'Not allowed.' ); }
+    check_admin_referer( 'orwost_update_pages' );
+    $slugs = isset( $_POST['orwost_pages'] ) && is_array( $_POST['orwost_pages'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['orwost_pages'] ) ) : array();
+    orwost_apply_page_updates( $slugs );
+    wp_safe_redirect( admin_url( 'themes.php?page=orwost-setup' ) ); exit;
+} );
+add_action( 'admin_notices', function () {
+    if ( current_user_can( 'manage_options' ) && get_option( 'orwost_setup_done' ) && orwost_page_updates() && 'appearance_page_orwost-setup' !== ( get_current_screen()->id ?? '' ) ) {
+        echo '<div class="notice notice-info"><p><strong>ORWO Studios:</strong> this theme version has new page designs. <a href="' . esc_url( admin_url( 'themes.php?page=orwost-setup' ) ) . '">Review and apply page updates</a>.</p></div>';
+    }
+} );
+
 add_action( 'admin_menu', function () {
     add_theme_page( 'ORWO Studios Setup', 'ORWO Studios Setup', 'manage_options', 'orwost-setup', function () {
+        $updates = get_option( 'orwost_setup_done' ) ? orwost_page_updates() : array();
+        if ( $updates ) {
+            echo '<div class="wrap"><h1>ORWO Studios page updates</h1><p>This theme version changes the design of the pages below. Pages nobody has edited are ticked. A page that was edited is not ticked: updating it replaces those edits (they stay available under the page\'s Revisions).</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="orwost_update_pages">';
+            wp_nonce_field( 'orwost_update_pages' );
+            echo '<ul>';
+            foreach ( $updates as $slug => $item ) {
+                echo '<li><label><input type="checkbox" name="orwost_pages[]" value="' . esc_attr( $slug ) . '"' . checked( ! $item['edited'], true, false ) . '> <strong>' . esc_html( $item['row']['title'] ) . '</strong> — ' . esc_html( $item['edited'] ? 'edited since setup' : 'unchanged since setup' ) . ' (<a href="' . esc_url( get_permalink( $item['post'] ) ) . '" target="_blank">view</a>)</label></li>';
+            }
+            echo '</ul><p><button class="button button-primary" type="submit">Update selected pages</button></p></form></div>';
+        }
         $pages = count( array_filter( orwost_pages_data(), function ( $r ) { return 'post' !== ( $r['type'] ?? 'page' ); } ) );
         $posts = count( orwost_pages_data() ) - $pages;
         echo '<div class="wrap"><h1>ORWO Studios</h1><p>Creates the original ' . (int) $pages . ' editable pages at their original addresses, ' . (int) $posts . ' blog articles with their categories, ' . count( orwost_media_manifest() ) . ' Media Library images, the menu, header and footer. Home becomes the front page. Existing pages, articles and edits are never overwritten. Back up an existing site first.</p>';

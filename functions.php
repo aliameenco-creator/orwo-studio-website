@@ -221,3 +221,16 @@ add_action( 'wp_head', function () {
     if ( $description ) { echo '<meta property="og:description" content="' . esc_attr( $description ) . '">'; }
     if ( has_post_thumbnail( $id ) ) { echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( $id, 'full' ) ) . '">'; }
 } );
+
+/** FAQPage structured data from the FAQ page's own (editable) question blocks; runs alongside SEO plugins. */
+add_action( 'wp_head', function () {
+    if ( ! is_page( 'faq' ) ) { return; }
+    if ( ! preg_match_all( '~<details[^>]*>\s*<summary>(.*?)</summary>(.*?)</details>~s', (string) get_post_field( 'post_content', get_queried_object_id() ), $m, PREG_SET_ORDER ) ) { return; }
+    $items = array();
+    foreach ( $m as $qa ) {
+        $answer = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( preg_replace( '~<div class="wp-block-buttons.*?</div>\s*</div>~s', '', $qa[2] ) ) ) );
+        $question = trim( wp_strip_all_tags( $qa[1] ) );
+        if ( $question && $answer ) { $items[] = array( '@type' => 'Question', 'name' => html_entity_decode( $question ), 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => html_entity_decode( $answer ) ) ); }
+    }
+    if ( $items ) { echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@type' => 'FAQPage', 'mainEntity' => $items ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>'; }
+} );
