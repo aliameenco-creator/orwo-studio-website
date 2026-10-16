@@ -139,6 +139,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "CGI (Computer Generated Imagery) - A Definitive Guide",
     "description": "ChatGPT said:\n\nDiscover how computer generated imagery (CGI) transforms films and event studios for rent with lifelike visuals, animation."
   },
@@ -151,7 +152,9 @@
     "featured": "/assets/img/694ea35d9d18b7dd-1248.webp",
     "excerpt": "Discover why celluloid is back in 2025—major productions on 35mm, intensive restoration projects and the lasting value of analogue workflows.",
     "categories": [
-      "Film",
+      "Film"
+    ],
+    "tags": [
       "analogue",
       "processing",
       "narnia",
@@ -171,6 +174,7 @@
     "categories": [
       "Film"
     ],
+    "tags": [],
     "seo_title": "Film Distribution - A Complete Guide",
     "description": "Film distribution is the process of delivering movies to theaters, streaming platforms, or TV, ensuring they reach the right audience worldwide."
   },
@@ -186,6 +190,7 @@
       "Film",
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "Film Set - A Definitive Guide",
     "description": "Read Definitive Guide of a Film Set, we've answered all your questions like Types of Film Sets, Roles On a Film Set, Safety, Film Set jargon & much more"
   },
@@ -198,7 +203,9 @@
     "featured": "/assets/img/c8b0b9b11e85ffc0-1600.webp",
     "excerpt": "Discover how Black Hangar Studios is leading the green revolution in filmmaking — from LED volume stages to carbon-neutral production infrastructure.",
     "categories": [
-      "Film Production",
+      "Film Production"
+    ],
+    "tags": [
       "black hangar studios",
       "sustainable",
       "green",
@@ -218,6 +225,7 @@
     "categories": [
       "Film"
     ],
+    "tags": [],
     "seo_title": "How Do You Become A Scriptwriter​?",
     "description": "Before knowing how do you become a scriptwriter, it's key to know what the job's all about. What does a scriptwriter do goes way beyond just writing dialogue."
   },
@@ -232,6 +240,7 @@
     "categories": [
       "Film"
     ],
+    "tags": [],
     "seo_title": "How Long Does It Take To Make A Movie?",
     "description": "Making a movie can take months to years to finish, today we aim to make filmmakers understand how long does it take to make a movie."
   },
@@ -246,6 +255,7 @@
     "categories": [
       "Film"
     ],
+    "tags": [],
     "seo_title": "How to Make a Movie from Start to Finish – Full Guide",
     "description": "Learning how to make a movie might seem impossible, but it's definitely doable with all the resources available today."
   },
@@ -260,6 +270,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "How to Make a Short Film?",
     "description": "Whether you're making a short film or planning bigger, this guide has got you covered. It's packed with industry secrets, expert advice, & real-life lessons."
   },
@@ -274,6 +285,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "How To Not Get Injured In Film Production?",
     "description": "how to avoid getting injured in film production and keep all on-set workers safe."
   },
@@ -287,7 +299,9 @@
     "excerpt": "UK film-tax reforms in 2025 are driving a production boom — discover why sound stages like Black Hangar Studios are emerging as strategic hubs.",
     "categories": [
       "Film Production",
-      "film",
+      "Film"
+    ],
+    "tags": [
       "black hangar studios",
       "independant"
     ],
@@ -303,6 +317,7 @@
     "featured": "/assets/img/d402c256da2e1c77-720.webp",
     "excerpt": "BY IGN Chase and Laine head to the Horror Hound festival where Laine begins to experience unexplained premonitions and disturbing visions associated with The Creeper and the town's",
     "categories": [],
+    "tags": [],
     "seo_title": "Jeepers Creepers: Reborn - Official Teaser Trailer",
     "description": "BY IGN Chase and Laine head to the Horror Hound festival where Laine begins to experience unexplained premonitions and disturbing visions associated with The Creeper and the town's"
   },
@@ -315,6 +330,7 @@
     "featured": "/assets/img/3dd891e890a8d87c-1000.webp",
     "excerpt": "BY DEADLINE EXCLUSIVE: Jonathan Rhys Meyers (Vikings, The Tudors) and MyAnna Buring (The Witcher, The Salisbury Poisonings) have signed on to star alongside Alec Baldwin in the hij",
     "categories": [],
+    "tags": [],
     "seo_title": "Jonathan Rhys Meyers, MyAnna Buring Join Alec Baldwin In Hijacking Thriller ‘97 Minutes’",
     "description": "BY DEADLINE EXCLUSIVE: Jonathan Rhys Meyers (Vikings, The Tudors) and MyAnna Buring (The Witcher, The Salisbury Poisonings) have signed on to star alongside Alec Baldwin in the hij"
   },
@@ -327,7 +343,9 @@
     "featured": "/assets/img/b11ef697e2c21a24-1600.webp",
     "excerpt": "From VistaVision to 35 mm renaissance and high-resolution scanning, discover why film stock and analogue workflows matter in 2025 cinema.",
     "categories": [
-      "film",
+      "Film"
+    ],
+    "tags": [
       "celluloid",
       "analogue",
       "cinematography",
@@ -345,6 +363,7 @@
     "featured": "/assets/img/c99343c516d1550d-1600.webp",
     "excerpt": "When the Edinburgh Filmhouse reopened in June 2025, it made headlines not just as a rescued local institution but as a declaration: celluloid is back. The newly refurbished venue w",
     "categories": [],
+    "tags": [],
     "seo_title": "The Celluloid Rebellion: Why Film Is Back On Screen in 2025",
     "description": "When the Edinburgh Filmhouse reopened in June 2025, it made headlines not just as a rescued local institution but as a declaration: celluloid is back. The newly refurbished venue w"
   },
@@ -358,7 +377,9 @@
     "excerpt": "Regional film hubs like Louisiana and Berkshire are reshaping production geography in 2025—discover what this means for your processing, scanning and archival workflow.",
     "categories": [
       "Film Production",
-      "Film",
+      "Film"
+    ],
+    "tags": [
       "independant",
       "black hangar studios",
       "cpc"
@@ -376,8 +397,10 @@
     "excerpt": "In 2025’s AI-enabled film industry, the human craft still matters. Discover why studios are prioritising human teams, scan fidelity and intentional workflows.",
     "categories": [
       "Film Production",
+      "Film"
+    ],
+    "tags": [
       "ai",
-      "film",
       "veniceFF",
       "craft"
     ],
@@ -394,8 +417,10 @@
     "excerpt": "Why film is making a comeback in 2025—from blockbusters on 35 mm to high-resolution scanning and human-led restoration workflows.",
     "categories": [
       "Film",
+      "Film Production"
+    ],
+    "tags": [
       "film festival",
-      "Film Production",
       "ferrania",
       "cannes"
     ],
@@ -411,7 +436,9 @@
     "featured": "/assets/img/f0ac50d6749001f4-1200.webp",
     "excerpt": "­The analogue resurgence is quietly global In 2025, amid the hum of new digital cameras and AI-driven workflows, something old-school is gaining unexpected momentum: film on film.",
     "categories": [
-      "film",
+      "Film"
+    ],
+    "tags": [
       "celluloid",
       "analogue",
       "london",
@@ -431,6 +458,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "What Does a Music Producer Do In Film Projects?",
     "description": "Discover the vital role of music producers in film. See how they shape soundtracks to enhance emotion and elevate every scene in your movie project."
   },
@@ -445,6 +473,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "What Does a Producer Do? Learn Their Role in Filmmaking",
     "description": "Discover what a film producer does, their role in filmmaking, and how they power Louisiana’s booming film industry and growing job market."
   },
@@ -459,6 +488,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "What Is a Showrunner and What Do They Do in TV Series?",
     "description": "Discover what a showrunner does in a TV series, from managing scripts to overseeing production, they’re the creative force behind every successful show."
   },
@@ -473,6 +503,7 @@
     "categories": [
       "Film"
     ],
+    "tags": [],
     "seo_title": "What Is a Storyboard? The Ultimate Guide",
     "description": "Storyboard is a vital step in filmmaking that helps visualize scenes, plan shots, and bring creative ideas to life with clarity."
   },
@@ -487,6 +518,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "What Is Cinematography and Why It Matters?",
     "description": "So what does cinematography mean? It's the art of shooting video for film and TV. But it's a lot more than just aiming a camera and rolling tape."
   },
@@ -501,6 +533,7 @@
     "categories": [
       "Film Production"
     ],
+    "tags": [],
     "seo_title": "What is Color Grading - A Definitive Guide",
     "description": "Color grading is the process of adjusting and enhancing colors in film or video to create a specific mood, style, or visual tone."
   },
@@ -513,8 +546,10 @@
     "featured": "/assets/img/4cf15ab5a759e923-1600.webp",
     "excerpt": "In October 2025, London becomes more than a festival city — it becomes a vital crossroads of past and future for cinema. The 69th BFI London Film Festival (8–19 October) is not jus",
     "categories": [
-      "film festival",
-      "film"
+      "Film"
+    ],
+    "tags": [
+      "film festival"
     ],
     "seo_title": "When Celluloid Takes Center Stage: Film, Restoration & Revival at the 2025 BFI London Film Festival",
     "description": "In October 2025, London becomes more than a festival city — it becomes a vital crossroads of past and future for cinema. The 69th BFI London Film Festival (8–19 October) is not jus"
@@ -529,7 +564,9 @@
     "excerpt": "As film restoration booms and widescreen formats return, 2025 becomes a landmark year for cinematic heritage — explore why Black Hangar Studios is ideally positioned to support bot",
     "categories": [
       "Film",
-      "Film Production",
+      "Film Production"
+    ],
+    "tags": [
       "black hangar studios"
     ],
     "seo_title": "When Film Comes Alive: Restoration, Revival — and What It Means for Black Hangar Studios",

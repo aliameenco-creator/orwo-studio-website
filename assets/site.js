@@ -166,6 +166,12 @@
     $$('.stat-number').forEach(el => counter.observe(el));
   }
 
+  /* Blog filter "More" dropdown closes on an outside click or Escape. */
+  $$('.chips-more').forEach(more => {
+    document.addEventListener('click', e => { if (more.open && !more.contains(e.target)) more.open = false; });
+    more.addEventListener('keydown', e => { if (e.key === 'Escape') { more.open = false; more.querySelector('summary').focus(); } });
+  });
+
   /* Reading progress on articles. */
   const bar = document.querySelector('.orwost-progress span'), article = document.querySelector('.orwost-article');
   if (bar && article) {

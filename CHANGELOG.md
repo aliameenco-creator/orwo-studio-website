@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.3 — 2026-10-16
+
+Blog categories made simple and manageable (owner feedback: two "film" chips, too many chips, chips hidden off-screen).
+
+- Categories (Posts → Categories) are the blog filter: "Film Production" and "Film". The duplicate lowercase
+  "film" is merged into "Film" (its old address /blog/categories/film-1991038/ redirects to /blog/categories/film/).
+- The other 19 Strikingly labels (analogue, celluloid, ferrania, cannes …) are now **topics** (Posts → Tags), shown as
+  "Topics" on each article and still reachable at their original /blog/categories/<name>/ addresses.
+- Filter bar: chips wrap onto new lines (nothing hidden off-screen). If more than 7 categories are ever added, the
+  rest move into a "More" dropdown, so the bar stays tidy. On a topic page the topic shows as an active chip.
+- Rule for editors: use a category for a broad section of the blog, a tag for any detail.
+
+**After updating the theme:** Appearance → ORWO Studios Setup → tick "Blog categories" → **Apply selected updates**.
+
 ## 0.1.2 — 2026-10-16
 
 Phone polish and an editable menu (owner feedback with phone screenshots).

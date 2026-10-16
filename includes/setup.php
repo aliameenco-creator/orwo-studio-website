@@ -23,6 +23,58 @@ function orwost_seed_categories() {
     return $map;
 }
 
+function orwost_json( $file ) { return (array) json_decode( (string) file_get_contents( get_theme_file_path( 'parts/' . $file ) ), true ); }
+
+/** Original Strikingly labels that are topics (tags) at their original /blog/categories/<slug> addresses. */
+function orwost_seed_tags() {
+    $map = array();
+    foreach ( orwost_json( 'tags.json' ) as $tag ) {
+        $term = get_term_by( 'slug', $tag['slug'], 'post_tag' );
+        if ( ! $term ) {
+            $made = wp_insert_term( $tag['name'], 'post_tag', array( 'slug' => $tag['slug'] ) );
+            if ( is_wp_error( $made ) ) { continue; }
+            $term = get_term( $made['term_id'], 'post_tag' );
+        }
+        $map[ $tag['name'] ] = (int) $term->term_id;
+    }
+    return $map;
+}
+
+/**
+ * 0.1.3 blog taxonomy for sites set up earlier: categories that are now topics still exist as categories,
+ * or the duplicate "film" category is still there.
+ */
+function orwost_taxonomy_pending() {
+    foreach ( array_merge( wp_list_pluck( orwost_json( 'tags.json' ), 'slug' ), array_keys( orwost_json( 'merged-categories.json' ) ) ) as $slug ) {
+        if ( get_term_by( 'slug', $slug, 'category' ) ) { return true; }
+    }
+    return false;
+}
+/**
+ * Turns the topic categories into tags on the same articles (same names and addresses), merges the duplicate
+ * "film" category into "Film" and removes the emptied categories. Categories the owner added are untouched.
+ */
+function orwost_apply_taxonomy() {
+    $moved = 0; $merged = 0;
+    $tags = orwost_seed_tags();
+    foreach ( orwost_json( 'tags.json' ) as $tag ) {
+        $cat = get_term_by( 'slug', $tag['slug'], 'category' );
+        if ( ! $cat || empty( $tags[ $tag['name'] ] ) ) { continue; }
+        foreach ( get_objects_in_term( $cat->term_id, 'category' ) as $post_id ) { wp_add_object_terms( (int) $post_id, $tags[ $tag['name'] ], 'post_tag' ); }
+        wp_delete_term( $cat->term_id, 'category' );
+        ++$moved;
+    }
+    foreach ( orwost_json( 'merged-categories.json' ) as $old => $into ) {
+        $cat = get_term_by( 'slug', $old, 'category' );
+        $target = get_term_by( 'slug', $into, 'category' );
+        if ( ! $cat || ! $target ) { continue; }
+        foreach ( get_objects_in_term( $cat->term_id, 'category' ) as $post_id ) { wp_add_object_terms( (int) $post_id, (int) $target->term_id, 'category' ); }
+        wp_delete_term( $cat->term_id, 'category' );
+        ++$merged;
+    }
+    return 'Blog categories: ' . $moved . ' labels are now topics (Posts → Tags) on the same articles and addresses; ' . $merged . ' duplicate merged into "Film".';
+}
+
 /** WordPress's untouched starter content, which must never stand in for a real page. */
 function orwost_is_sample( $post, $title, $phrase ) {
     return $post && $title === $post->post_title && str_contains( $post->post_content, $phrase );
@@ -36,6 +88,7 @@ function orwost_pages_seed() {
     $sample = get_page_by_path( 'sample-page' );
     if ( orwost_is_sample( $sample, 'Sample Page', 'This is an example page.' ) && 'trash' !== $sample->post_status ) { wp_trash_post( $sample->ID ); $report[] = 'WordPress "Sample Page" moved to the trash (untouched).'; }
     $categories = orwost_seed_categories();
+    $topics = orwost_seed_tags();
     $version = wp_get_theme()->get( 'Version' );
     foreach ( orwost_pages_data() as $row ) {
         $key = $row['slug'];
@@ -77,6 +130,7 @@ function orwost_pages_seed() {
         if ( ! empty( $row['description'] ) ) { update_post_meta( $id, '_orwost_description', $row['description'] ); update_post_meta( $id, '_yoast_wpseo_metadesc', $row['description'] ); }
         if ( 'post' === $type && ! empty( $row['categories'] ) ) {
             wp_set_post_categories( $id, array_values( array_filter( array_map( function ( $name ) use ( $categories ) { return $categories[ $name ] ?? 0; }, $row['categories'] ) ) ) );
+            if ( ! empty( $row['tags'] ) ) { wp_set_post_terms( $id, array_values( array_filter( array_map( function ( $name ) use ( $topics ) { return $topics[ $name ] ?? 0; }, $row['tags'] ) ) ), 'post_tag' ); }
         }
         if ( ! empty( $row['featured'] ) && preg_match( '~/assets/img/([a-f0-9]+)-~', $row['featured'], $m ) ) {
             $ids = orwost_media_ids(); if ( ! empty( $ids[ $m[1] ] ) ) { set_post_thumbnail( $id, $ids[ $m[1] ] ); }
@@ -172,11 +226,12 @@ add_action( 'admin_post_orwost_update_pages', function () {
     check_admin_referer( 'orwost_update_pages' );
     $slugs = isset( $_POST['orwost_pages'] ) && is_array( $_POST['orwost_pages'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['orwost_pages'] ) ) : array();
     orwost_apply_page_updates( $slugs );
+    if ( ! empty( $_POST['orwost_taxonomy'] ) ) { update_option( 'orwost_setup_report', array_merge( array( orwost_apply_taxonomy() ), (array) get_option( 'orwost_setup_report', array() ) ), false ); }
     if ( ! empty( $_POST['orwost_menu'] ) ) { update_option( 'orwost_setup_report', array_merge( array( orwost_create_menu() ), (array) get_option( 'orwost_setup_report', array() ) ), false ); }
     wp_safe_redirect( admin_url( 'themes.php?page=orwost-setup' ) ); exit;
 } );
 add_action( 'admin_notices', function () {
-    if ( current_user_can( 'manage_options' ) && get_option( 'orwost_setup_done' ) && ( orwost_page_updates() || orwost_menu_pending() ) && 'appearance_page_orwost-setup' !== ( get_current_screen()->id ?? '' ) ) {
+    if ( current_user_can( 'manage_options' ) && get_option( 'orwost_setup_done' ) && ( orwost_page_updates() || orwost_menu_pending() || orwost_taxonomy_pending() ) && 'appearance_page_orwost-setup' !== ( get_current_screen()->id ?? '' ) ) {
         echo '<div class="notice notice-info"><p><strong>ORWO Studios:</strong> this theme version has updates for your pages or menu. <a href="' . esc_url( admin_url( 'themes.php?page=orwost-setup' ) ) . '">Review and apply theme updates</a>.</p></div>';
     }
 } );
@@ -185,10 +240,12 @@ add_action( 'admin_menu', function () {
     add_theme_page( 'ORWO Studios Setup', 'ORWO Studios Setup', 'manage_options', 'orwost-setup', function () {
         $updates = get_option( 'orwost_setup_done' ) ? orwost_page_updates() : array();
         $menu_pending = get_option( 'orwost_setup_done' ) && orwost_menu_pending();
-        if ( $updates || $menu_pending ) {
+        $taxonomy_pending = get_option( 'orwost_setup_done' ) && orwost_taxonomy_pending();
+        if ( $updates || $menu_pending || $taxonomy_pending ) {
             echo '<div class="wrap"><h1>ORWO Studios theme updates</h1><p>This theme version brings the updates below. Pages nobody has edited are ticked. A page that was edited is not ticked: updating it replaces those edits (they stay available under the page\'s Revisions).</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="orwost_update_pages">';
             wp_nonce_field( 'orwost_update_pages' );
             echo '<ul>';
+            if ( $taxonomy_pending ) { echo '<li><label><input type="checkbox" name="orwost_taxonomy" value="1" checked> <strong>Blog categories</strong> — keep "Film" and "Film Production" as the blog filter, merge the duplicate "film" into "Film", and turn the other labels into topics (Posts → Tags) on the same articles. Their addresses stay the same.</label></li>'; }
             if ( $menu_pending ) { echo '<li><label><input type="checkbox" name="orwost_menu" value="1" checked> <strong>Main menu</strong> — create the header menu under Appearance → Menus (without Lamplighter Suites), so it can be edited there</label></li>'; }
             foreach ( $updates as $slug => $item ) {
                 echo '<li><label><input type="checkbox" name="orwost_pages[]" value="' . esc_attr( $slug ) . '"' . checked( ! $item['edited'], true, false ) . '> <strong>' . esc_html( $item['row']['title'] ) . '</strong> — ' . esc_html( $item['edited'] ? 'edited since setup' : 'unchanged since setup' ) . ' (<a href="' . esc_url( get_permalink( $item['post'] ) ) . '" target="_blank">view</a>)</label></li>';

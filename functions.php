@@ -118,16 +118,24 @@ add_shortcode( 'orwost_social', function ( $attrs ) {
     return $out . '</ul>';
 } );
 
-/** Category chips for the blog index (original /blog/categories/<slug> addresses). */
+/**
+ * Blog filter: All + every category (Posts → Categories), most-used first. Chips wrap (never hidden off-screen);
+ * from the 8th category on they move into a "More" dropdown, so the bar stays tidy however many categories exist.
+ * On a topic (tag) page the current topic is shown as an extra active chip.
+ */
 add_shortcode( 'orwost_categories', function () {
     $terms = get_terms( array( 'taxonomy' => 'category', 'hide_empty' => true, 'orderby' => 'count', 'order' => 'DESC' ) );
-    if ( is_wp_error( $terms ) || ! $terms ) { return ''; }
-    $current = is_category() ? get_queried_object_id() : 0;
+    $terms = is_wp_error( $terms ) ? array() : array_values( array_filter( $terms, function ( $t ) { return 'uncategorized' !== $t->slug; } ) );
+    $current = ( is_category() || is_tag() ) ? get_queried_object_id() : 0;
+    $chip = function ( $term ) use ( $current ) { return '<a href="' . esc_url( get_term_link( $term ) ) . '"' . ( $current === $term->term_id ? ' aria-current="page"' : '' ) . '>' . esc_html( $term->name ) . '</a>'; };
     $out = '<nav class="orwost-chips" aria-label="Blog categories"><a href="' . esc_url( home_url( '/blog/' ) ) . '"' . ( $current ? '' : ' aria-current="page"' ) . '>All</a>';
-    foreach ( $terms as $term ) {
-        if ( 'uncategorized' === $term->slug ) { continue; }
-        $out .= '<a href="' . esc_url( get_term_link( $term ) ) . '"' . ( $current === $term->term_id ? ' aria-current="page"' : '' ) . '>' . esc_html( $term->name ) . '</a>';
+    foreach ( array_slice( $terms, 0, 7 ) as $term ) { $out .= $chip( $term ); }
+    $more = array_slice( $terms, 7 );
+    if ( $more ) {
+        $active = in_array( $current, wp_list_pluck( $more, 'term_id' ), true );
+        $out .= '<details class="chips-more"><summary' . ( $active ? ' aria-current="page"' : '' ) . '>More</summary><div class="chips-menu">' . implode( '', array_map( $chip, $more ) ) . '</div></details>';
     }
+    if ( is_tag() ) { $out .= '<a href="' . esc_url( get_term_link( get_queried_object() ) ) . '" aria-current="page" class="chip-topic">#' . esc_html( single_tag_title( '', false ) ) . '</a>'; }
     return $out . '</nav>';
 } );
 
@@ -164,8 +172,12 @@ add_filter( 'request', function ( $vars ) {
     if ( is_admin() ) { return $vars; }
     $path = orwost_request_path();
     if ( preg_match( '~^blog/categories/([^/]+)(?:/page/(\d+))?$~', $path, $m ) ) {
+        $paged = empty( $m[2] ) ? array() : array( 'paged' => (int) $m[2] );
         $term = get_term_by( 'slug', sanitize_title( $m[1] ), 'category' );
-        if ( $term ) { return array( 'category_name' => $term->slug ) + ( empty( $m[2] ) ? array() : array( 'paged' => (int) $m[2] ) ); }
+        if ( $term ) { return array( 'category_name' => $term->slug ) + $paged; }
+        // Topics (tags) keep the original Strikingly category addresses.
+        $tag = get_term_by( 'slug', sanitize_title( $m[1] ), 'post_tag' );
+        if ( $tag ) { return array( 'tag' => $tag->slug ) + $paged; }
         return $vars;
     }
     if ( ! preg_match( '~^blog/([^/]+)$~', $path, $m ) || 'categories' === $m[1] || get_page_by_path( 'blog/' . $m[1] ) ) { return $vars; }
@@ -180,7 +192,7 @@ add_filter( 'post_link', function ( $link, $post ) {
     return home_url( user_trailingslashit( '/blog/' . $post->post_name ) );
 }, 10, 2 );
 add_filter( 'term_link', function ( $link, $term, $taxonomy ) {
-    if ( 'category' !== $taxonomy || '' === (string) get_option( 'permalink_structure' ) ) { return $link; }
+    if ( ! in_array( $taxonomy, array( 'category', 'post_tag' ), true ) || '' === (string) get_option( 'permalink_structure' ) ) { return $link; }
     return home_url( user_trailingslashit( '/blog/categories/' . $term->slug ) );
 }, 10, 3 );
 add_filter( 'strict_redirect_guess_404_permalink', '__return_true' );
@@ -190,7 +202,12 @@ add_action( 'template_redirect', function () {
     // Platform-only and duplicate addresses of the old site: one address per page.
     $aliases = array( 'home' => '/', 'film-studio' => '/', '_blog' => '/blog/', 'bnb' => '/hotel/', 'blog/categories' => '/blog/', 'pages' => '/pages/cookie-policy/', 'c/apps/google_map' => '/contact/' );
     if ( isset( $aliases[ $path ] ) ) { wp_safe_redirect( home_url( $aliases[ $path ] ), 301 ); exit; }
-    if ( preg_match( '~^blog/categories/([^/]+)$~', $path, $m ) && ! term_exists( sanitize_title( $m[1] ), 'category' ) ) { wp_safe_redirect( home_url( '/blog/' ), 301 ); exit; }
+    if ( preg_match( '~^blog/categories/([^/]+)$~', $path, $m ) ) {
+        $slug = sanitize_title( $m[1] );
+        $merged = (array) json_decode( (string) file_get_contents( get_theme_file_path( 'parts/merged-categories.json' ) ), true );
+        if ( isset( $merged[ $slug ] ) && ! term_exists( $slug, 'category' ) ) { wp_safe_redirect( home_url( '/blog/categories/' . $merged[ $slug ] . '/' ), 301 ); exit; }
+        if ( ! term_exists( $slug, 'category' ) && ! term_exists( $slug, 'post_tag' ) ) { wp_safe_redirect( home_url( '/blog/' ), 301 ); exit; }
+    }
     if ( is_singular( 'post' ) && 'publish' === get_post_status() && '' !== (string) get_option( 'permalink_structure' ) && 'blog/' . rawurldecode( (string) get_post_field( 'post_name' ) ) !== $path ) {
         wp_safe_redirect( get_permalink(), 301 ); exit;
     }
