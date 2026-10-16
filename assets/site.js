@@ -42,14 +42,15 @@
     title.style.animation = 'none';
   });
 
-  /* Home hero: the original muted background showreel (desktop, motion allowed, not on data saver). */
+  /* Home hero: the original muted background showreel starts a few seconds after the page loads
+     (phones included; not with reduced motion or data saver). The poster stays until it really plays. */
   const heroVideo = document.querySelector('.orwost-hero[class*="ytbg-"]');
-  if (heroVideo && desktop.matches && !reduced && !(navigator.connection && navigator.connection.saveData)) {
+  if (heroVideo && !reduced && !(navigator.connection && navigator.connection.saveData)) {
     const cls = heroVideo.className;
     const id = (cls.match(/(?:^|\s)ytbg-([A-Za-z0-9_-]{11})(?=\s|$)/) || [])[1];
     const scale = Math.min(2, Math.max(1, ((cls.match(/ytscale-(\d+)/) || [])[1] || 1000) / 1000));
     if (id) {
-      addEventListener('load', () => {
+      const start = () => setTimeout(() => {
         const box = document.createElement('div'); box.className = 'hero-video'; box.setAttribute('aria-hidden', 'true');
         box.style.setProperty('--yt-scale', scale);
         const frame = document.createElement('iframe');
@@ -64,7 +65,8 @@
         frame.addEventListener('load', () => frame.contentWindow.postMessage(JSON.stringify({event: 'listening', id: 1, channel: 'widget'}), '*'));
         box.append(frame);
         heroVideo.querySelector('.hero-photo')?.after(box);
-      });
+      }, desktop.matches ? 600 : 2500);
+      if (document.readyState === 'complete') start(); else addEventListener('load', start);
     }
   }
 
@@ -107,9 +109,11 @@
     const go = i => { index = (i + cards.length) % cards.length; rail.scrollTo({left: cards[index].offsetLeft - rail.offsetLeft - parseFloat(getComputedStyle(rail).paddingLeft), behavior: reduced ? 'auto' : 'smooth'}); };
     const sync = raf(() => { const mid = rail.scrollLeft + rail.clientWidth / 2; index = cards.reduce((best, c, i) => Math.abs(c.offsetLeft - rail.offsetLeft + c.offsetWidth / 2 - mid) < Math.abs(cards[best].offsetLeft - rail.offsetLeft + cards[best].offsetWidth / 2 - mid) ? i : best, 0); [...dots.children].forEach((d, i) => d.classList.toggle('on', i === index)); });
     rail.addEventListener('scroll', sync, {passive: true}); sync();
-    const auto = () => { clearInterval(timer); if (!reduced) timer = setInterval(() => go(index + 1), 6000); };
-    rail.addEventListener('pointerdown', () => clearInterval(timer), {passive: true});
-    auto();
+    // Gentle auto-advance until the visitor touches the cards; after that only their own swipes move it.
+    const stop = () => { clearInterval(timer); rail.removeEventListener('touchstart', stop); rail.removeEventListener('pointerdown', stop); };
+    if (!reduced) timer = setInterval(() => go(index + 1), 6000);
+    rail.addEventListener('touchstart', stop, {passive: true});
+    rail.addEventListener('pointerdown', stop, {passive: true});
   });
   const dotStyle = document.createElement('style');
   dotStyle.textContent = '.rail-dots{display:flex;justify-content:center;gap:8px;margin-top:18px!important}.rail-dots button{width:8px;height:8px;padding:0;border:0;border-radius:99px;background:rgba(0,0,0,.2);transition:width .3s,background-color .3s}.rail-dots button.on{width:26px;background:#0aa6dc}';
@@ -141,7 +145,9 @@
     }), {threshold: .08, rootMargin: '0px 0px -6% 0px'});
     const targets = '.section-head,.about-copy>*,.service-card,.stage-card,.film-card,.press-card,.stat-card,.figure-card,.facility-card,.feature-row,.set-block,.occasion-card,.news-card,.partner-card,.menu-card,.menu-photo,.wp-block-details,.orwost-post-grid>li,.grid-photo,.poster,.contact-details,.form-panel,.orwo-film-copy,.stages-copy,.follow-copy,.cta-inner,.company-inner,.story-inner,.banner-copy,.jake-copy,.reading>*,.footer-cta,.tax-intro-grid>*,.subhead,.orwost-map,.rental-intro,.orwost-chips';
     $$(targets).forEach(el => {
-      if (el.closest('.orwost-hero,[aria-hidden="true"],.quote-viewport')) return;
+      if (el.closest('.orwost-hero,[aria-hidden="true"],.quote-viewport,.film-rail')) return;
+      // Cards in swipe rails stay static: off-screen cards would otherwise fade in mid-swipe and look glitchy.
+      if (phone.matches && el.closest('.orwost-carousel-mobile,.occasion-grid,.news-grid,.quote-rail')) return;
       const siblings = [...el.parentElement.children];
       el.style.setProperty('--d', (Math.min(siblings.indexOf(el), 8) % 8) * 70 + 'ms');
       el.classList.add('rv'); io.observe(el);

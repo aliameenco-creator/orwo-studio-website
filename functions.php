@@ -13,6 +13,37 @@ add_action( 'after_setup_theme', function () {
     add_theme_support( 'responsive-embeds' );
     add_theme_support( 'editor-styles' );
     add_editor_style( array( 'assets/site.css', 'assets/editor.css' ) );
+    // A normal WordPress menu (Appearance → Menus) drives the header navigation.
+    register_nav_menus( array( 'primary' => 'Main menu (header)' ) );
+} );
+
+/** Navigation-link/submenu blocks for one level of the menu assigned to the "Main menu" location. */
+function orwost_menu_blocks( $by_parent, $parent ) {
+    $blocks = array();
+    foreach ( $by_parent[ $parent ] ?? array() as $item ) {
+        $children = orwost_menu_blocks( $by_parent, (int) $item->ID );
+        $attrs = array( 'label' => $item->title, 'url' => $item->url, 'kind' => 'custom' );
+        if ( '_blank' === $item->target ) { $attrs['opensInNewTab'] = true; }
+        $classes = trim( implode( ' ', array_filter( (array) $item->classes ) ) );
+        if ( '' !== $classes ) { $attrs['className'] = $classes; }
+        if ( $item->attr_title ) { $attrs['title'] = $item->attr_title; }
+        $blocks[] = array( 'blockName' => $children ? 'core/navigation-submenu' : 'core/navigation-link', 'attrs' => $attrs, 'innerBlocks' => $children, 'innerHTML' => '', 'innerContent' => array_fill( 0, count( $children ), null ) );
+    }
+    return $blocks;
+}
+/** The header navigation shows the assigned WordPress menu; without one it keeps the links saved in the header. */
+add_filter( 'render_block_data', function ( $block ) {
+    if ( 'core/navigation' !== ( $block['blockName'] ?? '' ) || ! str_contains( (string) ( $block['attrs']['className'] ?? '' ), 'orwost-nav' ) ) { return $block; }
+    $locations = get_nav_menu_locations();
+    $items = empty( $locations['primary'] ) ? array() : wp_get_nav_menu_items( $locations['primary'], array( 'update_post_term_cache' => false ) );
+    if ( ! $items ) { return $block; }
+    $by_parent = array();
+    foreach ( $items as $item ) { $by_parent[ (int) $item->menu_item_parent ][] = $item; }
+    $inner = orwost_menu_blocks( $by_parent, 0 );
+    unset( $block['attrs']['ref'] );
+    $block['innerBlocks'] = $inner;
+    $block['innerContent'] = array_fill( 0, count( $inner ), null );
+    return $block;
 } );
 add_action( 'wp_enqueue_scripts', function () {
     $v = wp_get_theme()->get( 'Version' );

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.2 — 2026-10-16
+
+Phone polish and an editable menu (owner feedback with phone screenshots).
+
+- Phone home hero: logo and tagline left-aligned, only the "Production Services" button; the outline "Contact Us"
+  button and the "Play video" pill are gone. The muted showreel now also starts on phones, a few seconds after
+  the page loads (not with reduced motion or data saver; the still frame stays until the video really plays).
+- Phone menu: the blue "Contact Us" button sits at the end of the hamburger menu (compact spacing so it fits on
+  screen); no Contact button in the phone header. The footer buttons no longer wrap on phones.
+- Smoother swiping on phones: cards in swipe rows no longer fade in mid-swipe, hover lifts/zooms are off on touch
+  screens, glass blur removed from the sound-stage cards on touch devices, testimonial auto-advance stops as soon
+  as the visitor touches the cards.
+- Testimonial cards size to their own quote (no large empty space under short quotes).
+- Menu: Lamplighter Suites removed. The header now uses a normal WordPress menu, "Main menu" under
+  Appearance → Menus (add, rename, reorder or remove items there).
+
+**After updating the theme:** Appearance → ORWO Studios Setup → tick "Main menu" (and FAQ if not done yet) →
+**Apply selected updates**.
+
 ## 0.1.1 — 2026-10-16
 
 - Fixed: dropdown menu links (Services, Hotel) were dark grey on the dark menu; they are now light, with cyan on hover.

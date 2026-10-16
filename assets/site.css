@@ -727,6 +727,44 @@ body.admin-bar .site-header { top: 32px; }
   .wp-block-details summary { padding: 18px 56px 18px 18px; }
   .wp-block-details > :not(summary) { margin: 0 18px 18px !important; }
 }
+/* ---------- phones: calm, left-aligned home hero with one action; the showreel plays behind it */
+@media (max-width: 640px) {
+  .home-hero { text-align: left; padding: 120px 22px 44px; min-height: calc(100svh - 2 * var(--inset)); }
+  .home-hero .hero-copy { align-items: flex-start; }
+  .home-hero .hero-logo { width: 118px; }
+  .home-hero .hero-title { max-width: 13ch; font-size: min(8.2vw, 34px); }
+  .home-hero .hero-actions { justify-content: flex-start; width: auto; }
+  .home-hero .hero-actions .wp-block-button { flex: 0 0 auto; }
+  .home-hero .hero-actions .wp-block-button__link { width: auto; padding-inline: 26px; }
+  .home-hero .hero-actions .wp-block-button.is-style-outline, .home-hero .hero-play { display: none; }
+  /* Swipe rails: native momentum scrolling only, cards size to their own content (no stretched empty space). */
+  :is(.orwost-carousel-mobile, .occasion-grid, .news-grid, .quote-rail, .film-rail) { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; }
+  .quote-rail { align-items: start; }
+  .quote-card { padding-bottom: 22px; }
+}
+@media (max-width: 640px) {
+  /* Compact phone menu so the Contact Us button is reachable without much scrolling. */
+  .orwost-nav .is-menu-open .wp-block-navigation__responsive-container-content { padding-top: 64px !important; }
+  .orwost-nav .is-menu-open .wp-block-navigation__container > .wp-block-navigation-item > .wp-block-navigation-item__content { font-size: 25px !important; padding: 5px 0 !important; }
+  .orwost-nav .is-menu-open .wp-block-navigation__submenu-container { margin: 0 0 6px 4px; padding-bottom: 4px !important; }
+  .orwost-nav .is-menu-open .wp-block-navigation__submenu-container .wp-block-navigation-item__content { font-size: 15px !important; padding: 5px 0 !important; }
+  .orwost-nav .is-menu-open .wp-block-navigation__container > .wp-block-navigation-item:is(.menu-contact, :has(> a[href$="/contact/"])) { margin-top: 16px; }
+  .footer-cta .wp-block-button__link { white-space: nowrap; font-size: 14px; padding-inline: 8px; }
+}
+.quote-rail.is-marquee { align-items: flex-start; }
+.quote-text { flex: none; }
+/* The Contact Us button lives inside the phone/tablet menu (the header button is desktop only). */
+.orwost-nav .is-menu-open .wp-block-navigation__container > .wp-block-navigation-item:is(.menu-contact, :has(> a[href$="/contact/"])) { margin-top: 22px; }
+.orwost-nav .is-menu-open .wp-block-navigation__container > .wp-block-navigation-item:is(.menu-contact, :has(> a[href$="/contact/"])) > .wp-block-navigation-item__content.wp-block-navigation-item__content { display: inline-flex; padding: 16px 30px !important; border-radius: 999px; background: var(--cyan); color: #06141a !important; font: 800 16px/1 var(--sans) !important; }
+.orwost-nav .is-menu-open .menu-contact > a::before, .orwost-nav .is-menu-open .wp-block-navigation-item:has(> a[href$="/contact/"]) > a::before { content: none; }
+/* Lamplighter Suites is not linked for now (also hides it in a footer saved by an earlier version). */
+.footer-col p:has(> a[href*="lamplightersuites"]) { display: none; }
+/* Touch screens: no hover lifts/zooms, which "stick" after a tap and make swiping look jumpy. */
+@media (hover: none) {
+  :is(.service-card, .occasion-card, .news-card, .quote-card, .stat-card, .press-card, .partner-card, .figure-card, .facility-card, .stage-card, .partner-logo, .hero-play, .orwost-social a, .post-navigation a, .wp-block-button__link):hover { transform: none !important; }
+  :is(.service-card, .occasion-card, .news-card, .film-card, .feature-row, .marquee-photo, .grid-photo, .poster, .set-thumb, .set-main, .collage-photo, .follow-video, .quote-card, .orwost-post-grid > li):hover img { transform: none !important; }
+  .stage-card { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(20, 20, 23, .78); }
+}
 @media (max-width: 380px) {
   .orwost-post-grid { grid-template-columns: 1fr !important; }
   .stat-grid, .stat-grid.three { gap: 8px; }

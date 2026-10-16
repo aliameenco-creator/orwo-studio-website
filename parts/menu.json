@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Film Studio",
+    "url": "/",
+    "children": []
+  },
+  {
+    "title": "Tax Credit",
+    "url": "/tax-credit/",
+    "children": []
+  },
+  {
+    "title": "Services",
+    "url": "/production-services/",
+    "children": [
+      {
+        "title": "Production Services",
+        "url": "/production-services/"
+      },
+      {
+        "title": "Standing Sets",
+        "url": "/standing-sets/"
+      },
+      {
+        "title": "Event Space",
+        "url": "/event-space/"
+      },
+      {
+        "title": "Prop Shop",
+        "url": "/prop-shop/"
+      },
+      {
+        "title": "Equipment Rental",
+        "url": "/equipment-rental/"
+      },
+      {
+        "title": "Sales & Distribution",
+        "url": "https://www.orwodistribution.com/"
+      },
+      {
+        "title": "Buy ORWO film",
+        "url": "https://www.orwo.shop/"
+      },
+      {
+        "title": "FAQ",
+        "url": "/faq/"
+      }
+    ]
+  },
+  {
+    "title": "Projects",
+    "url": "/projects/",
+    "children": []
+  },
+  {
+    "title": "News",
+    "url": "/news/",
+    "children": []
+  },
+  {
+    "title": "Hotel",
+    "url": "/hotel/",
+    "children": [
+      {
+        "title": "Mackie's Bar & Grill",
+        "url": "/mackie-s-bar-and-grill/"
+      },
+      {
+        "title": "ORWO Studios Hotel",
+        "url": "/hotel/"
+      }
+    ]
+  },
+  {
+    "title": "Blog",
+    "url": "/blog/",
+    "children": []
+  },
+  {
+    "title": "Contact Us",
+    "url": "/contact/",
+    "children": []
+  }
+]

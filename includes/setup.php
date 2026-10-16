@@ -85,6 +85,7 @@ function orwost_pages_seed() {
         if ( ! empty( $row['privacy'] ) ) { update_option( 'wp_page_for_privacy_policy', $id ); }
         $report[] = $row['title'] . ( $takeover ? ': created from the WordPress privacy draft.' : ': created.' );
     }
+    $report[] = orwost_create_menu();
     // Native Site Editor parts, saved once with real Media Library URLs. Theme updates never overwrite them.
     foreach ( array( 'header', 'footer' ) as $slug ) {
         if ( get_option( 'orwost_part_' . $slug ) ) { continue; }
@@ -97,6 +98,36 @@ function orwost_pages_seed() {
     update_option( 'orwost_setup_done', 1, false );
     flush_rewrite_rules();
     return $report;
+}
+
+/** True when no WordPress menu is assigned to the header yet. */
+function orwost_menu_pending() { return ! has_nav_menu( 'primary' ); }
+
+/**
+ * Creates the "Main menu" (Appearance → Menus) from parts/menu.json and assigns it to the header.
+ * Never touches a menu that is already assigned; an existing menu named "Main menu" is assigned as it is.
+ */
+function orwost_create_menu() {
+    if ( ! orwost_menu_pending() ) { return 'Main menu: a menu is already assigned to the header; it was kept as it is.'; }
+    $menu = wp_get_nav_menu_object( 'Main menu' );
+    $id = $menu ? (int) $menu->term_id : wp_create_nav_menu( 'Main menu' );
+    if ( is_wp_error( $id ) ) { return 'Main menu: FAILED — ' . $id->get_error_message(); }
+    if ( ! $menu ) {
+        $add = function ( $item, $parent ) use ( $id ) {
+            $external = str_starts_with( $item['url'], 'http' );
+            $args = array( 'menu-item-title' => $item['title'], 'menu-item-url' => $external ? $item['url'] : home_url( $item['url'] ), 'menu-item-type' => 'custom', 'menu-item-status' => 'publish', 'menu-item-parent-id' => $parent );
+            if ( $external ) { $args['menu-item-target'] = '_blank'; }
+            if ( '/contact/' === $item['url'] && ! $parent ) { $args['menu-item-classes'] = 'menu-contact'; }
+            return wp_update_nav_menu_item( $id, 0, $args );
+        };
+        foreach ( (array) json_decode( (string) file_get_contents( get_theme_file_path( 'parts/menu.json' ) ), true ) as $item ) {
+            $top = $add( $item, 0 );
+            if ( is_wp_error( $top ) ) { continue; }
+            foreach ( $item['children'] as $child ) { $add( $child, (int) $top ); }
+        }
+    }
+    set_theme_mod( 'nav_menu_locations', array_merge( (array) get_theme_mod( 'nav_menu_locations', array() ), array( 'primary' => $id ) ) );
+    return 'Main menu: created and shown in the header. Edit it under Appearance → Menus.';
 }
 
 /**
@@ -141,25 +172,28 @@ add_action( 'admin_post_orwost_update_pages', function () {
     check_admin_referer( 'orwost_update_pages' );
     $slugs = isset( $_POST['orwost_pages'] ) && is_array( $_POST['orwost_pages'] ) ? array_map( 'sanitize_key', wp_unslash( $_POST['orwost_pages'] ) ) : array();
     orwost_apply_page_updates( $slugs );
+    if ( ! empty( $_POST['orwost_menu'] ) ) { update_option( 'orwost_setup_report', array_merge( array( orwost_create_menu() ), (array) get_option( 'orwost_setup_report', array() ) ), false ); }
     wp_safe_redirect( admin_url( 'themes.php?page=orwost-setup' ) ); exit;
 } );
 add_action( 'admin_notices', function () {
-    if ( current_user_can( 'manage_options' ) && get_option( 'orwost_setup_done' ) && orwost_page_updates() && 'appearance_page_orwost-setup' !== ( get_current_screen()->id ?? '' ) ) {
-        echo '<div class="notice notice-info"><p><strong>ORWO Studios:</strong> this theme version has new page designs. <a href="' . esc_url( admin_url( 'themes.php?page=orwost-setup' ) ) . '">Review and apply page updates</a>.</p></div>';
+    if ( current_user_can( 'manage_options' ) && get_option( 'orwost_setup_done' ) && ( orwost_page_updates() || orwost_menu_pending() ) && 'appearance_page_orwost-setup' !== ( get_current_screen()->id ?? '' ) ) {
+        echo '<div class="notice notice-info"><p><strong>ORWO Studios:</strong> this theme version has updates for your pages or menu. <a href="' . esc_url( admin_url( 'themes.php?page=orwost-setup' ) ) . '">Review and apply theme updates</a>.</p></div>';
     }
 } );
 
 add_action( 'admin_menu', function () {
     add_theme_page( 'ORWO Studios Setup', 'ORWO Studios Setup', 'manage_options', 'orwost-setup', function () {
         $updates = get_option( 'orwost_setup_done' ) ? orwost_page_updates() : array();
-        if ( $updates ) {
-            echo '<div class="wrap"><h1>ORWO Studios page updates</h1><p>This theme version changes the design of the pages below. Pages nobody has edited are ticked. A page that was edited is not ticked: updating it replaces those edits (they stay available under the page\'s Revisions).</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="orwost_update_pages">';
+        $menu_pending = get_option( 'orwost_setup_done' ) && orwost_menu_pending();
+        if ( $updates || $menu_pending ) {
+            echo '<div class="wrap"><h1>ORWO Studios theme updates</h1><p>This theme version brings the updates below. Pages nobody has edited are ticked. A page that was edited is not ticked: updating it replaces those edits (they stay available under the page\'s Revisions).</p><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="orwost_update_pages">';
             wp_nonce_field( 'orwost_update_pages' );
             echo '<ul>';
+            if ( $menu_pending ) { echo '<li><label><input type="checkbox" name="orwost_menu" value="1" checked> <strong>Main menu</strong> — create the header menu under Appearance → Menus (without Lamplighter Suites), so it can be edited there</label></li>'; }
             foreach ( $updates as $slug => $item ) {
                 echo '<li><label><input type="checkbox" name="orwost_pages[]" value="' . esc_attr( $slug ) . '"' . checked( ! $item['edited'], true, false ) . '> <strong>' . esc_html( $item['row']['title'] ) . '</strong> — ' . esc_html( $item['edited'] ? 'edited since setup' : 'unchanged since setup' ) . ' (<a href="' . esc_url( get_permalink( $item['post'] ) ) . '" target="_blank">view</a>)</label></li>';
             }
-            echo '</ul><p><button class="button button-primary" type="submit">Update selected pages</button></p></form></div>';
+            echo '</ul><p><button class="button button-primary" type="submit">Apply selected updates</button></p></form></div>';
         }
         $pages = count( array_filter( orwost_pages_data(), function ( $r ) { return 'post' !== ( $r['type'] ?? 'page' ); } ) );
         $posts = count( orwost_pages_data() ) - $pages;
